@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="layout/layout :: head"></head>
+<body>
+
+	<header th:replace="layout/layout :: header"></header>
+
+	<div class="container py-4">
+
+		<div class="card bg-light">
+			<div class="card-header" th:text="${titulo}"></div>
+			<div class="card-body">
+
+				<h4 class="card-title">
+					<a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-primary btn-xs"
+						th:href="@{'/registro/form/' + ${empleado.id}}"
+						th:text="'crear registro'"></a>
+				</h4>
+
+				<img th:if="${#strings.length(empleado.foto) > 0}"
+					class="img-thumbnail rounded float-left" style="max-width: 25%;"
+					th:src="@{'/uploads/' + ${empleado.foto}}" th:alt="${empleado.foto}" />
+
+				<ul class="list-group">
+					<li class="list-group-item active" th:text="${empleado.nombre}"></li>
+					<li class="list-group-item" th:text="${empleado.apellido}"></li>
+					<li class="list-group-item" th:text="${empleado.email}"></li>
+					<li class="list-group-item" th:text="${empleado.createAt}"></li>
+				</ul>
+
+				<div th:if="${#lists.isEmpty(empleado.registros)}"
+					class="alert alert-info my-4"
+					th:text="'No hay registros asignadas para el empleado ' + ${empleado.nombre} + ' ' + ${empleado.apellido}"></div>
+
+				<table th:if="${not #lists.isEmpty(empleado.registros)}"
+					class="table table-bordered table-striped my-4">
+					<thead class="thead-inverse">
+						<tr>
+							<th>folio</th>
+							<th>descripción</th>
+							<th>fecha</th>
+							<th>total</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">ver</th>
+							<th sec:authorize="hasRole('ROLE_ADMIN')">eliminar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="registro: ${empleado.registros}">
+							<td th:text="${registro.id}"></td>
+							<td th:text="${registro.descripcion}"></td>
+							<td th:text="${registro.createAt}"></td>
+							<td th:text="${registro.total}"></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-primary btn-xs"
+								th:href="@{'/registro/ver/' + ${registro.id}}" th:text="'detalle'"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+								th:href="@{'/registro/eliminar/' + ${registro.id}}"
+								th:text="'eliminar'"
+								onclick="return confirm('¿Estas seguro que desea eliminar la registro?');"></a></td>
+						</tr>
+					</tbody>
+
+				</table>
+
+			</div>
+		</div>
+
+	</div>
+
+	<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>
+
